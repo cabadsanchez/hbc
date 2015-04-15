@@ -21,13 +21,17 @@ import com.twitter.hbc.core.endpoint.StreamingEndpoint;
 import com.twitter.hbc.twitter4j.message.DisconnectMessage;
 import com.twitter.hbc.twitter4j.message.StallWarningMessage;
 import com.twitter.hbc.twitter4j.parser.JSONObjectParser;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import twitter4j.*;
 import twitter4j.conf.ConfigurationBuilder;
+
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static com.twitter.hbc.twitter4j.parser.JSONObjectParser.parseFriendList;
 
@@ -71,9 +75,10 @@ class BaseTwitter4jClient implements Twitter4jClient {
       public void run() {
         try {
           while (!client.isDone()) {
-            String msg = messageQueue.take();
+            String msg = messageQueue.poll(100, TimeUnit.MILLISECONDS);
             try {
-              parseMessage(msg);
+              if(msg != null)
+                parseMessage(msg);
             } catch (Exception e) {
               logger.warn("Exception thrown during parsing msg " + msg, e);
               onException(e);
