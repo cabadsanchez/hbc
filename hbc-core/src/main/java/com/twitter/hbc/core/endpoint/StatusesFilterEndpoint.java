@@ -13,11 +13,14 @@
 
 package com.twitter.hbc.core.endpoint;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.List;
+import java.util.Map;
+
 import com.google.common.base.Joiner;
 import com.twitter.hbc.core.Constants;
 import com.twitter.hbc.core.HttpConstants;
-
-import java.util.List;
 
 public class StatusesFilterEndpoint extends DefaultStreamingEndpoint {
 
@@ -50,5 +53,19 @@ public class StatusesFilterEndpoint extends DefaultStreamingEndpoint {
   public StatusesFilterEndpoint locations(List<Location> locations) {
     addPostParameter(Constants.LOCATION_PARAM, Joiner.on(',').join(locations));
     return this;
+  }
+  
+  public String getTrackTerms() throws UnsupportedEncodingException {
+	  String trackTerms = "";
+	  if(postParameters.containsKey(Constants.TRACK_PARAM))
+		  trackTerms = postParameters.get(Constants.TRACK_PARAM);
+	  return URLDecoder.decode(trackTerms, "UTF-8");
+  }
+  
+  public String getFollowings() throws UnsupportedEncodingException {
+	  String follow = "";
+	  if(postParameters.containsKey(Constants.FOLLOW_PARAM))
+		  follow = postParameters.get(Constants.FOLLOW_PARAM);
+	  return URLDecoder.decode(follow, "UTF-8");
   }
 }
